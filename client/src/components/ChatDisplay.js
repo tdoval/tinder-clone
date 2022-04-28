@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import ChatInput from './ChatInput';
 import Chat from './Chat';
+import ChatInput from './ChatInput';
 import axios from 'axios';
+import { useState, useEffect } from 'react';
 
 const ChatDisplay = ({ user, clickedUser }) => {
   const userId = user?.user_id;
@@ -63,7 +63,12 @@ const ChatDisplay = ({ user, clickedUser }) => {
   return (
     <>
       <Chat descendingOrderMessages={descendingOrderMessages} />
-      <ChatInput />
+      <ChatInput
+        user={user}
+        clickedUser={clickedUser}
+        getUserMessages={getUsersMessages}
+        getClickedUsersMessages={getClickedUsersMessages}
+      />
     </>
   );
 };
