@@ -24,7 +24,6 @@ app.post('/signup', async (req, res) => {
     await client.connect();
     const database = client.db('app-data');
     const users = database.collection('users');
-    l;
     const existingUser = await users.findOne({ email });
     if (existingUser) {
       return res.status(409).send('User already exists. Please login');
@@ -50,6 +49,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
+// Log in to the Database
 app.post('/login', async (req, res) => {
   const client = new MongoClient(uri);
   const { email, password } = req.body;
@@ -72,9 +72,30 @@ app.post('/login', async (req, res) => {
       });
       res.status(201).json({ token, userId: user.user_id });
     }
-    res.status(400).send('Invalid Credentials');
-  } catch (error) {
-    console.log(error);
+
+    res.status(400).json('Invalid Credentials');
+  } catch (err) {
+    console.log(err);
+  } finally {
+    await client.close();
+  }
+});
+
+// Get individual user
+app.get('/user', async (req, res) => {
+  const client = new MongoClient(uri);
+  const userId = req.query.userId;
+
+  try {
+    await client.connect();
+    const database = client.db('app-data');
+    const users = database.collection('users');
+
+    const query = { user_id: userId };
+    const user = await users.findOne(query);
+    res.send(user);
+  } finally {
+    await client.close();
   }
 });
 
@@ -117,7 +138,7 @@ app.put('/user', async (req, res) => {
         matches: formData.matches,
       },
     };
-    const insertedUser = await users.updateOne(query, updateDocument);
+    const insertedUser = await user.updateOne(query, updateDocument);
     res.send(insertedUser);
   } finally {
     await client.close();
